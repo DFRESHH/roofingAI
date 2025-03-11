@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAI Sales Training Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .chat-container {
+            height: calc(100vh - 240px);
+        }
+        .message-container {
+            max-height: calc(100vh - 340px);
+        }
+        .user-message {
+            background-color: #e3f2fd;
+            border-radius: 1rem 1rem 0 1rem;
+            margin-left: 2rem;
+            margin-right: 1rem;
+        }
+        .assistant-message {
+            background-color: #f1f5f9;
+            border-radius: 1rem 1rem 1rem 0;
+            margin-right: 2rem;
+            margin-left: 1rem;
+            border: 1px solid #e2e8f0;
+        }
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            margin: 0.5rem 0;
+        }
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background-color: #718096;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: bounce 1.5s infinite ease-in-out;
+        }
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .mic-button {
+            transition: all 0.3s ease;
+        }
+        .mic-active {
+            background-color: #ef4444 !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <!-- Header -->
+<div class="mb-4 border-b pb-3">
+    <div class="flex items-center mb-1">
+        <span class="mr-2">
+            <img src="static/images/MAI.png" alt="MAI" class="w-16 h-16 rounded-full">
+        </span>
+        <h1 class="text-xl font-bold text-gray-800">MAI Sales Assistant Interface</h1>
+    </div>
+    <p class="text-gray-600 text-sm">MAI (Marketing AI) is a virtual sales assistant that you can help train to become better at sales conversations.</p>
+</div>
+
+<!-- User ID Input with thinner design -->
+<div class="mb-3 bg-blue-50 p-2 rounded">
+    <label for="user-id" class="block text-xs font-medium text-gray-700 mb-1">
+        <i class="fas fa-id-badge mr-1"></i> Customer Name
+    </label>
+    <div class="flex gap-2">
+        <input type="text" id="user-id" 
+               class="w-full p-1 border rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition"
+               placeholder="Enter your Customer Name">
+        <button id="connect-button" onclick="initializeSession()" 
+                class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition flex items-center"
+                aria-label="Connect to chat session">
+            <i class="fas fa-play mr-1" aria-hidden="true"></i> Chat
+        </button>
+    </div>
+    <p class="text-xs text-gray-500 mt-1">Your Customer Name is needed to advance the conversation.</p>
+</div>
+
+<!-- Status indicator -->
+<div id="status-bar" class="mb-3 hidden">
+    <div class="flex items-center p-1 rounded bg-gray-100">
+        <span id="status-icon" class="mr-2 text-green-500"><i class="fas fa-circle"></i></span>
+        <span id="status-message" class="text-xs">Connected as: <span id="connected-user-id" class="font-medium"></span></span>
+    </div>
+</div>
+
+            <!-- Voice Controls -->
+            <div id="voice-controls" class="mb-4 hidden">
+                <div class="flex items-center p-2 rounded bg-blue-50 gap-2">
+                    <button id="toggle-voice" 
+                        class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 transition flex items-center"
+                        aria-label="Toggle voice output">
+                        <i class="fas fa-volume-up mr-1" aria-hidden="true"></i> Voice: On
+                    </button>
+                    <span class="text-xs text-gray-500">Toggle voice output for MAI's responses</span>
+                </div>
+            </div>
+
+            <!-- Chat Container -->
+            <div class="chat-container bg-gray-50 rounded-lg p-4 mb-4 border">
+                <div id="empty-state" class="h-full flex flex-col items-center justify-center text-gray-400">
+                    <div class="text-5xl mb-3"><i class="far fa-comments"></i></div>
+                    <p class="text-center max-w-md">Enter your trainer ID and connect to start a training session with MAI. Your conversations help improve its sales skills.</p>
+                </div>
+                <div id="chat-messages" class="message-container overflow-y-auto hidden">
+                    <!-- Messages will appear here -->
+                </div>
+                <div id="typing-indicator" class="typing-indicator pl-4 hidden">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="flex gap-2">
+                <div class="flex-1 relative">
+                    <input type="text" id="message-input" 
+                           class="w-full p-3 pr-10 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition disabled:bg-gray-100 disabled:cursor-not-allowed"
+                           placeholder="Type your message..." disabled>
+                    <span id="char-count" class="absolute right-3 bottom-3 text-xs text-gray-400 hidden">0</span>
+                </div>
+                <button id="mic-button" 
+                        class="mic-button bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition disabled:bg-gray-300 disabled:cursor-not-allowed"
+                        disabled
+                        aria-label="Toggle microphone">
+                    <i class="fas fa-microphone" aria-hidden="true"></i>
+                </button>
+                <div class="flex gap-2">
+                    <button id="send-button" onclick="sendMessage()" 
+                            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition disabled:bg-blue-300 disabled:cursor-not-allowed" 
+                            disabled
+                            aria-label="Send message">
+                        <i class="fas fa-paper-plane mr-1" aria-hidden="true"></i> Send
+                    </button>
+                    <button id="reset-button" onclick="confirmReset()" 
+                            class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition disabled:bg-gray-300 disabled:cursor-not-allowed" 
+                            disabled
+                            aria-label="Reset conversation">
+                        <i class="fas fa-redo-alt mr-1" aria-hidden="true"></i> Reset
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Help text -->
+            <div class="mt-4 text-xs text-gray-500">
+                <p><i class="fas fa-info-circle mr-1"></i> Tips: 
+                   Ask MAI about its sales capabilities, and how its can help you grow your sales team. You can also use the microphone button to speak your messages.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset confirmation modal -->
+    <div id="reset-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 max-w-md mx-4">
+            <h3 class="text-lg font-medium mb-3">Reset Conversation</h3>
+            <p class="mb-4">Are you sure you want to reset the conversation? This will clear all current messages.</p>
+            <div class="flex justify-end gap-2">
+                <button onclick="hideResetModal()" 
+                    class="px-4 py-2 border rounded hover:bg-gray-100 transition"
+                    aria-label="Cancel reset">
+                    Cancel
+                </button>
+                <button onclick="resetConversation()" 
+                    class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                    aria-label="Confirm reset conversation">
+                    Reset
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const messageInput = document.getElementById('message-input');
+        const chatMessages = document.getElementById('chat-messages');
+        const emptyState = document.getElementById('empty-state');
+        const statusBar = document.getElementById('status-bar');
+        const voiceControls = document.getElementById('voice-controls');
+        const connectedUserId = document.getElementById('connected-user-id');
+        const userIdInput = document.getElementById('user-id');
+        const sendButton = document.getElementById('send-button');
+        const resetButton = document.getElementById('reset-button');
+        const micButton = document.getElementById('mic-button');
+        const toggleVoiceButton = document.getElementById('toggle-voice');
+        const resetModal = document.getElementById('reset-modal');
+        const typingIndicator = document.getElementById('typing-indicator');
+        const charCount = document.getElementById('char-count');
+        
+        // Active session tracker
+        let activeSession = false;
+        
+        // Voice synthesis setup
+        const synth = window.speechSynthesis;
+        let voiceEnabled = true;
+        
+        // Speech recognition setup
+        let recognition = null;
+        if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+            recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+        } else {
+            console.warn("Speech recognition not supported");
+        }
+    
+        // Handle Enter key
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    
+        // Character counter
+        messageInput.addEventListener('input', function() {
+            const count = this.value.length;
+            charCount.textContent = count;
+            if (count > 0) {
+                charCount.classList.remove('hidden');
+            } else {
+                charCount.classList.add('hidden');
+            }
+        });
+        
+        // Toggle voice output
+        toggleVoiceButton.addEventListener('click', function() {
+            voiceEnabled = !voiceEnabled;
+            
+            // Update button text and style
+            if (voiceEnabled) {
+                this.innerHTML = '<i class="fas fa-volume-up mr-1" aria-hidden="true"></i> Voice: On';
+                this.className = 'bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 transition flex items-center';
+                this.setAttribute('aria-label', 'Turn voice output off');
+            } else {
+                this.innerHTML = '<i class="fas fa-volume-mute mr-1" aria-hidden="true"></i> Voice: Off';
+                this.className = 'bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600 transition flex items-center';
+                this.setAttribute('aria-label', 'Turn voice output on');
+            }
+            
+            // If turning off, stop any current speech
+            if (!voiceEnabled) {
+                synth.cancel();
+            }
+        });
+        
+        // Speech recognition event handlers
+        if (recognition) {
+            recognition.onstart = function() {
+                micButton.classList.add('mic-active');
+                micButton.innerHTML = '<i class="fas fa-microphone-slash" aria-hidden="true"></i>';
+                micButton.setAttribute('aria-label', 'Stop listening');
+                messageInput.placeholder = "Listening...";
+            };
+            
+            recognition.onend = function() {
+                micButton.classList.remove('mic-active');
+                micButton.innerHTML = '<i class="fas fa-microphone" aria-hidden="true"></i>';
+                micButton.setAttribute('aria-label', 'Toggle microphone');
+                messageInput.placeholder = "Type your message...";
+            };
+            
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                messageInput.value = transcript;
+                charCount.textContent = transcript.length;
+                charCount.classList.remove('hidden');
+                
+                // Focus the input but don't auto-send
+                messageInput.focus();
+            };
+            
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error', event.error);
+                messageInput.placeholder = "Voice recognition error. Please try again.";
+                micButton.classList.remove('mic-active');
+                micButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                
+                setTimeout(() => {
+                    messageInput.placeholder = "Type your message...";
+                }, 3000);
+            };
+            
+            // Mic button click handler
+            micButton.addEventListener('click', function() {
+                if (!activeSession) {
+                    showError('Please connect with your trainer ID first');
+                    return;
+                }
+                
+                if (recognition) {
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        console.error('Recognition already started', e);
+                        recognition.stop();
+                    }
+                } else {
+                    alert('Speech recognition is not supported in this browser.');
+                }
+            });
+        } else {
+            micButton.style.display = 'none';
+        }
+    function speakText(text) {
+        if (!voiceEnabled) return;
+    
+        // Stop any ongoing speech
+        synth.cancel();
+    
+        const utterance = new SpeechSynthesisUtterance(text);
+    
+        // Get available voices
+        let voices = synth.getVoices();
+    
+        // Debugging: Log available voices
+        console.log("Available voices:", voices.map(v => v.name));
+    
+        // Try to find a female voice
+        let selectedVoice = null;
+    
+        // First try Microsoft Zira (a good US female voice)
+        selectedVoice = voices.find(voice => voice.name.includes("Microsoft Zira"));
+    
+        // If not found, try Google US English (which might be neutral)
+        if (!selectedVoice) {
+        selectedVoice = voices.find(voice => voice.name === "Google US English");
+        }
+    
+        // Apply the selected voice
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+        console.log("Using voice:", selectedVoice.name);
+        } else {
+        console.log("No preferred voice found. Using default.");
+    }
+    
+    // Make the voice more feminine if we're using Google US English
+    if (selectedVoice && selectedVoice.name === "Google US English") {
+        utterance.pitch = 1.2; // Higher pitch for more feminine sound
+    } else {
+        utterance.pitch = 1.05; // Normal pitch for Microsoft Zira
+    }
+    
+    // Fine-tune the voice to sound more natural
+    utterance.rate = 0.85;     // Slightly slower
+    utterance.pitch = 0.90;    // Slightly higher pitch
+    utterance.volume = 0.9;    // Full volume
+    
+    utterance.text = text;
+    
+    synth.speak(utterance);
+}
+    
+        function initializeSession() {
+            const userId = userIdInput.value.trim();
+            
+            if (!userId) {
+                showError('Please enter a Customer Name');
+                return;
+            }
+            console.log("Initializing session for: " + userId); // Debug log
+
+            // Update UI to connected state
+            activeSession = true;
+            statusBar.classList.remove('hidden');
+            voiceControls.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            chatMessages.classList.remove('hidden');
+            connectedUserId.textContent = userId;
+            
+            // Enable inputs
+            messageInput.disabled = false;
+            sendButton.disabled = false;
+            resetButton.disabled = false;
+            micButton.disabled = false;
+            userIdInput.disabled = true;
+            document.getElementById('connect-button').disabled = true;
+            
+            // Focus on message input
+            messageInput.focus();
+            
+            // Create custom greeting with the exact format you specified
+        setTimeout(() => {
+            hideTyping();
+            const customerName = userId;
+            const greeting = `Hi ${customerName}, I am Mia your virtual sales assistant, what has you looking into my site today?`;
+            addMessage('assistant', greeting);
+         }, 1000); // Simulate typing dela
+        }
+        
+        async function fetchInitialMessage(userId) {
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        message: "_init_" // Special flag for initialization
+                    })
+                });
+    
+                const data = await response.json();
+                hideTyping();
+                
+                if (data.error) {
+                    addMessage('assistant', 'Error: ' + data.error);
+                } else {
+                    addMessage('assistant', data.response);
+                }
+            } catch (error) {
+                hideTyping();
+                addMessage('assistant', 'Error: Could not connect to server');
+            }
+        }
+    
+        function addMessage(role, content) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `p-4 rounded-lg mb-3 ${
+                role === 'user' 
+                    ? 'user-message' 
+                    : 'assistant-message'
+            }`;
+            
+            // Add avatar/icon
+            const iconDiv = document.createElement('div');
+            iconDiv.className = 'flex items-start';
+            
+            // Create icon element
+            const icon = document.createElement('div');
+            if (role === 'user') {
+                icon.innerHTML = '<i class="fas fa-user-alt text-xl text-blue-500 mr-2"></i>';
+            } else {
+                // Using MAI icon
+                icon.innerHTML = '<img src="/static/images/MAI.png" alt="MAI" class="w-10 h-10 mr-2 rounded-full shadow-sm" />';
+                // Note: If you have a custom MAI image, uncomment this:
+                // icon.innerHTML = '<img src="/static/images/MAI.png" alt="MAI" class="w-8 h-8 mr-2 rounded-full" />';
+            }
+            
+            // Create message content    
+            const messageContent = document.createElement('div');
+            messageContent.className = 'flex-1';
+            
+            // Add role label
+            const roleLabel = document.createElement('div');
+            roleLabel.className = 'text-xs text-gray-500 mb-1';
+            roleLabel.textContent = role === 'user' ? 'You' : 'MAI';
+            
+            // Add message text
+            const textDiv = document.createElement('div');
+            textDiv.textContent = content;
+            
+            // Assemble message
+            messageContent.appendChild(roleLabel);
+            messageContent.appendChild(textDiv);
+            iconDiv.appendChild(icon);
+            iconDiv.appendChild(messageContent);
+            messageDiv.appendChild(iconDiv);
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Read aloud assistant messages
+            if (role === 'assistant') {
+                speakText(content);
+            }
+        }
+    
+        function showTyping() {
+            typingIndicator.classList.remove('hidden');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function hideTyping() {
+            typingIndicator.classList.add('hidden');
+        }
+    
+        function showError(message) {
+            alert(message);
+        }
+    
+        async function sendMessage() {
+            if (!activeSession) {
+                showError('Please connect with your trainer ID first');
+                return;
+            }
+            
+            const userId = userIdInput.value.trim();
+            const message = messageInput.value.trim();
+            
+            if (!userId) {
+                alert('Please enter a trainer ID');
+                return;
+            }
+            if (!message) return;
+    
+            // Add user message to chat
+            addMessage('user', message);
+            messageInput.value = '';
+            charCount.classList.add('hidden');
+            messageInput.disabled = true;
+            sendButton.disabled = true;
+            micButton.disabled = true;
+            
+            // Show typing indicator
+            showTyping();
+    
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        message: message
+                    })
+                });
+    
+                const data = await response.json();
+                hideTyping();
+                
+                if (data.error) {
+                    addMessage('assistant', 'Error: ' + data.error);
+                } else {
+                    addMessage('assistant', data.response);
+                }
+                
+                // Re-enable input
+                messageInput.disabled = false;
+                sendButton.disabled = false;
+                micButton.disabled = false;
+                messageInput.focus();
+                
+            } catch (error) {
+                hideTyping();
+                addMessage('assistant', 'Error: Could not connect to server');
+                messageInput.disabled = false;
+                sendButton.disabled = false;
+                micButton.disabled = false;
+            }
+        }
+    
+        function confirmReset() {
+            resetModal.classList.remove('hidden');
+        }
+        
+        function hideResetModal() {
+            resetModal.classList.add('hidden');
+        }
+    
+        async function resetConversation() {
+            hideResetModal();
+            
+            if (!activeSession) {
+                showError('Please connect with your trainer ID first');
+                return;
+            }
+            
+            const userId = userIdInput.value.trim();
+            
+            // Disable UI during reset
+            messageInput.disabled = true;
+            sendButton.disabled = true;
+            resetButton.disabled = true;
+            micButton.disabled = true;
+    
+            try {
+                const response = await fetch('/reset', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: userId
+                    })
+                });
+    
+                const data = await response.json();
+                if (data.error) {
+                    showError('Error: ' + data.error);
+                } else {
+                    // Clear chat and show the welcome message
+                    chatMessages.innerHTML = '';
+                    showTyping();
+                    fetchInitialMessage(userId);
+                }
+                
+                // Re-enable UI
+                messageInput.disabled = false;
+                sendButton.disabled = false;
+                resetButton.disabled = false;
+                micButton.disabled = false;
+                
+            } catch (error) {
+                showError('Error: Could not reset conversation');
+                
+                // Re-enable UI
+                messageInput.disabled = false;
+                sendButton.disabled = false;
+                resetButton.disabled = false;
+                micButton.disabled = false;
+            }
+        }
+        
+        // Initialize voices for Safari
+        window.onload = function() {
+            if (synth.onvoiceschanged !== undefined) {
+                synth.onvoiceschanged = function() {
+                    console.log("Voices loaded:", synth.getVoices().length);
+                };
+            }
+        };
+        
+        // Document ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Focus on user ID input on page load
+            userIdInput.focus();
+        });
+    </script>
+    

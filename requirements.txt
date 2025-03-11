@@ -1,0 +1,6 @@
+flask==2.3.3
+openai==1.63.2
+python-dotenv==1.0.0
+flask-cors==4.0.0
+nest-asyncio==1.6.0
+gunicorn==21.2.0

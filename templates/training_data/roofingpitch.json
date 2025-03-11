@@ -1,0 +1,170 @@
+{
+    "industry": "Roofing",
+    "version": "1.0",
+    "last_updated": "2025-03-11",
+    "terminology": [
+      {
+        "term": "Asphalt Shingles",
+        "definition": "The most common roofing material in the US, made of fiberglass mat coated with asphalt and granules.",
+        "talking_points": [
+          "Typically lasts 15-30 years depending on quality",
+          "Cost-effective option with good durability",
+          "Available in many colors and styles to match home aesthetics"
+        ]
+      },
+      {
+        "term": "Metal Roofing",
+        "definition": "Roofing system using metal pieces or tiles, often made from steel, aluminum, or copper.",
+        "talking_points": [
+          "Superior longevity (40-70 years)",
+          "Excellent for extreme weather conditions",
+          "Energy efficient due to reflective properties"
+        ]
+      }
+    ],
+    
+    "objection_handling": [
+      {
+        "objection": "Your quote is much higher than your competitor's.",
+        "response_strategy": "Acknowledge, then highlight value differences",
+        "talking_points": [
+          "I understand price is an important factor. Can I ask what was included in their quote?",
+          "Our quote includes premium materials that last 30% longer than standard materials",
+          "We include a comprehensive 20-year warranty covering both materials and labor",
+          "All our installers are certified and fully insured, which protects your investment"
+        ],
+        "avoid": [
+          "Criticizing the competitor directly",
+          "Immediately offering to match price without explaining value"
+        ]
+      },
+      {
+        "objection": "I want to wait until next year to replace my roof.",
+        "response_strategy": "Educate on risks of delay, offer inspection",
+        "talking_points": [
+          "I completely understand wanting to plan major expenses. May I ask what's driving the decision to wait?",
+          "Even minor roof damage can lead to significant interior water damage over time",
+          "Repair costs typically increase 15-25% when issues are left unaddressed",
+          "We offer a free comprehensive inspection to determine if waiting is a safe option"
+        ],
+        "avoid": [
+          "Creating unnecessary fear",
+          "Pushy tactics that undermine trust"
+        ]
+      }
+    ],
+    
+    "sales_scenarios": [
+      {
+        "scenario": "First-time homeowner needs roof replacement",
+        "customer_profile": "New to home maintenance, budget-conscious, concerned about making the right choice",
+        "approach": "Educational and reassuring",
+        "key_points": [
+          "Explain process step-by-step to build confidence",
+          "Offer good-better-best options with clear differences",
+          "Emphasize warranty and long-term value",
+          "Provide references from similar homeowners",
+          "Explain financing options available"
+        ],
+        "sample_questions": [
+          "How long have you owned your home?",
+          "Have you noticed any issues with your current roof?",
+          "What's most important to you in your new roof - longevity, appearance, or immediate cost?"
+        ]
+      },
+      {
+        "scenario": "Commercial property manager seeking bids",
+        "customer_profile": "Experienced, needs to justify expenses to owners, concerned about business disruption",
+        "approach": "Professional and ROI-focused",
+        "key_points": [
+          "Emphasize minimal business disruption during installation",
+          "Provide detailed documentation for their reporting needs",
+          "Focus on long-term cost savings and maintenance reduction",
+          "Highlight experience with similar commercial properties",
+          "Address compliance with building codes and regulations"
+        ],
+        "sample_questions": [
+          "What problems are you experiencing with the current roof?",
+          "How important is minimizing disruption to your tenants?",
+          "What documentation will you need for your approval process?"
+        ]
+      }
+    ],
+    
+    "competition_insights": [
+      {
+        "competitor_type": "Low-cost roofing companies",
+        "common_tactics": [
+          "Significantly lower initial quotes",
+          "Using economy materials",
+          "Employing less experienced labor"
+        ],
+        "differentiation_points": [
+          "Our comprehensive roof systems include proper ventilation and underlayment",
+          "All our crews are full-time employees, not seasonal subcontractors",
+          "We provide documented inspections and photos throughout the process",
+          "Our warranty covers both materials and workmanship for 20 years"
+        ]
+      },
+      {
+        "competitor_type": "Large national chains",
+        "common_tactics": [
+          "Heavy advertising and name recognition",
+          "Volume-based pricing",
+          "Standardized approaches"
+        ],
+        "differentiation_points": [
+          "Local ownership means direct accountability",
+          "Custom solutions for each home rather than one-size-fits-all",
+          "Same project manager throughout your entire project",
+          "Faster response times for service and questions"
+        ]
+      }
+    ],
+    
+    "value_propositions": [
+      {
+        "proposition": "Energy Efficiency",
+        "details": "Our roofing systems can reduce cooling costs by up to 20%",
+        "supporting_points": [
+          "Proper attic ventilation prevents heat buildup",
+          "Reflective shingle options reduce heat absorption",
+          "Enhanced insulation options available with roof replacement",
+          "ENERGY STAR certified materials qualify for tax credits"
+        ],
+        "ideal_for": ["Homeowners concerned about utility bills", "Environmentally conscious customers"]
+      },
+      {
+        "proposition": "Storm Protection",
+        "details": "Our roofing systems are rated for winds up to 130mph and impact-resistant against hail",
+        "supporting_points": [
+          "Enhanced nailing patterns exceed building code requirements",
+          "Premium ridge caps provide extra protection at vulnerable areas",
+          "Impact-resistant shingles may qualify for insurance discounts",
+          "Comprehensive water barrier system prevents leaks"
+        ],
+        "ideal_for": ["Areas prone to severe weather", "Customers who've experienced storm damage"]
+      }
+    ],
+    
+    "sample_dialogues": [
+      {
+        "situation": "Initial phone inquiry about roof leak",
+        "dialogue": [
+          {
+            "customer": "Hi, I think I might have a leak in my roof. There's a water stain on my ceiling.",
+            "response": "I'm sorry to hear that. Water stains can definitely be concerning. To help you best, could you tell me a bit more about when you first noticed it and if it's appeared after recent rainfall?"
+          },
+          {
+            "customer": "I just noticed it yesterday after the storm we had.",
+            "response": "That timing does suggest it could be related to your roof. One thing we can do is schedule a free inspection to identify exactly where the water is coming in and assess any damage. We have availability this week - would you prefer morning or afternoon?"
+          },
+          {
+            "customer": "I'd need to check my schedule first. How much would a repair typically cost?",
+            "response": "I understand wanting to know about costs upfront. Repair costs vary widely depending on the source and extent of the leak - it could be as simple as replacing a few shingles ($300-500) or might indicate a larger issue. The good news is our inspection is completely free with no obligation, and we'll provide a detailed estimate before any work begins. We can also check if this might be covered by your homeowner's insurance."
+          }
+        ]
+      }
+    ]
+  }
+  
